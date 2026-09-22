@@ -1,5 +1,6 @@
 // Core Module
 const path = require('path');
+require('dotenv').config();
 
 // External Module
 const express = require('express');
