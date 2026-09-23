@@ -8,7 +8,7 @@ exports.getAddHome = (req, res, next) => {
 };
 
 exports.getHostHomes = (req, res, next) => {
-  Home.fetchAll().then(data => {
+  Home.find().then(data => {
     const registeredHomes = data;
     res.render("host/host-home-list", {
       registeredHomes: registeredHomes,
@@ -20,9 +20,9 @@ exports.getHostHomes = (req, res, next) => {
 
 exports.postAddHome = (req, res) => {
   const { housename, price, location, rating, photourl } = req.body;
-  const home = new Home(housename, price, location, rating, photourl);
+  const home = new Home({housename, price, location, rating, photourl});
   home.save().then(() => {
-    console.log("home saved successfully")
+    console.log("home saved successfully");
   })
 
   res.render("host/home-added", {
@@ -32,7 +32,7 @@ exports.postAddHome = (req, res) => {
 };
 
 exports.postEditHome = (req, res) => {
-  Home.fetchById(req.body._id).then(Home => {
+  Home.findById(req.body._id).then(Home => {
     res.render("host/edit-home", {
     pageTitle: "edit Home",
     currentPage: 'host-homes',
@@ -42,11 +42,30 @@ exports.postEditHome = (req, res) => {
 }
 
 exports.postHomeEdited = (req, res) => {
-  Home.editDetail(req.body);
-  res.redirect('/host/host-home-list');
+  const { _id, housename, price, location, rating, photourl } = req.body;
+  console.log(housename);
+  Home.findById(_id).then((home) => {
+    if(!home){
+      console.log('home not found to edit');
+      res.redirect("host/host-homes");
+    }
+    home.housename = housename;
+    home.price = price;
+    home.location = location;
+    home.rating = rating;
+    home.photourl = photourl;
+
+    return home.save();
+  }).then(() => {
+    res.redirect('/host/host-home-list');
+  }).catch(err => {
+    console.log('error while updating home', err);
+  })
 }
 
-exports.postDeleteHome = (req, res) => {
-    Home.remHome(req.body._id);
+exports.postDeleteHome = async (req, res) => {
+    await Home.findByIdAndDelete(req.body._id).then(() => {
+      console.log('home deleted');
+    });
     res.redirect('/host/host-home-list');
 }

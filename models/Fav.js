@@ -1,39 +1,25 @@
-const { getDb } = require("../mongodb")
-const Home = require('./home');
+const mongoose = require('mongoose');
 
-module.exports = class FavouriteHomes{
-
-    static fetchFav (){
-    const db = getDb();
-    return db.collection('favHomeIds').find().toArray();
+const favSchema = new mongoose.Schema({
+  homeId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Home',
+    required: true,
+    unique: true
   }
+})
 
-  static addFav (favHome_id) {
-    const db = getDb();
-    // console.log(favHome_id + "\t is added");
-    this.fetchFav().then(data => {
-      if(data.find(ids => ids.homeId === favHome_id)){
-        console.log('home already added to favourite');
-      }else {
-        return db.collection('favHomeIds').insertOne({homeId: favHome_id});
-      }
-    })
-  }
+module.exports = mongoose.model('fav', favSchema);
 
-  static getFavs (callback) {
-    this.fetchFav().then(ids => {
-      const favIds = ids.map(favI => favI.homeId);
-      // console.log(favIds);
-      Home.fetchAll().then(homes => {
-        const FavHomes = homes.filter((home) => favIds.includes(String(home._id)));
-        // console.log(FavHomes);
-        callback(FavHomes);
-      })
-    })
-  }
-
-  static remFav (_id) {
-    const db = getDb();
-    return db.collection('favHomeIds').deleteOne({homeId: _id});
-  }
-}
+/*
+* static fetchFav ()
+* 
+* 
+* static addFav (favHome_id)
+* 
+* 
+* static getFavs (callback)
+* 
+* 
+* static remFav (_id)
+*/

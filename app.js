@@ -1,6 +1,7 @@
 // Core Module
 const path = require('path');
 require('dotenv').config();
+const mongoose = require('mongoose');
 
 // External Module
 const express = require('express');
@@ -10,7 +11,7 @@ const storeRouter = require("./routes/storeRouter")
 const hostRouter = require("./routes/hostRouter")
 const rootDir = require("./utils/pathUtil");
 const errorsController = require("./controllers/errors");
-const { mongoCon } = require('./mongodb');
+// const { mongoCon } = require('./mongodb');
 
 const app = express();
 
@@ -27,12 +28,11 @@ app.use(errorsController.pageNotFound);
 
 const PORT = 5173;
 
-mongoCon(() => {
+mongoose.connect(process.env.MONGO_AIRBNBDB_URI).then(() => {
   console.log("MongoDB Connected Successfully")
   app.listen(PORT, () => {
     console.log(`Server running on address http://localhost:${PORT}`);
   });
+}).catch(err => {
+  console.log("error connecting to mongo!", err);
 })
-
-
-

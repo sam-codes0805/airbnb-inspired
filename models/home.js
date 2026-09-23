@@ -1,12 +1,43 @@
-const { ObjectId } = require("mongodb");
-const { getDb } = require("../mongodb");
+const mongoose = require('mongoose');
+const Fav = require('./Fav');
+
+const homeSchema = new mongoose.Schema({
+    housename: {
+        type: String, 
+        required: true
+    }, 
+    price: {
+        type: Number, 
+        required: true
+    }, 
+    location: {
+        type: String,
+        required: true
+    },
+    rating: {
+        type: Number,
+        required: true
+    },
+    photourl: {
+        type: String,
+        required: true
+    }
+});
+
+homeSchema.pre('findOneAndDelete', async function() {
+    const homeId = this.getQuery()._id;
+    await Fav.deleteMany({homeId: homeId});
+    console.log('performing prehook instructions')
+})
+
+module.exports = mongoose.model('Home', homeSchema);
 
 
+/* 
 
-module.exports = class Home {
-  constructor(housename, price, location, rating, photourl, _id) {
-    // this._id = Math.floor(Math.random() * 10000);
-    this.housename = housename;
+
+*
+this.housename = housename;
     this.price = price;
     this.location = location;
     this.rating = rating;
@@ -14,44 +45,21 @@ module.exports = class Home {
     if(_id) {
       this._id = _id;
     }
-  }
+*
+    save()
+* 
+    static fetchAll()
+* 
+    static findById(_id)
+* 
+    static remHome (_id)
+* 
+    static editDetail (editedHome)
+*
 
-  save() {
-    const db = getDb();
-    return db.collection('homes').insertOne(this);
-  }
+  **  const { getDb } = require("../mongodb");
 
-  static fetchAll() {
-    const db = getDb();
-    return db.collection('homes').find().toArray();
-  }
+*
 
-  static fetchById(_id) {
-    const db = getDb();
-    return db.collection('homes')
-    .find({_id: new ObjectId(String(_id))})
-    .next();
-  }
 
-  static remHome (_id) {
-    console.log(_id);
-    const db = getDb();
-    return db.collection('homes').
-    deleteOne({_id: new ObjectId(String(_id))});
-  }
-
-  static editDetail (editedHome) {
-    const db = getDb();
-
-    console.log(editedHome);
-    const updatedHome = { 
-      housename: editedHome.housename,
-      price: editedHome.price,
-      location: editedHome.location,
-      rating: editedHome.rating,
-      photourl: editedHome.photourl
-    }
-
-    return db.collection('homes').updateOne({_id: new ObjectId(String(editedHome._id))}, { $set: updatedHome});
-  }
-}
+*/

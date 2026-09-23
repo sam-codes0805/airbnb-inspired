@@ -1,8 +1,8 @@
 const Home = require("../models/home");
-const favHomes = require("../models/Fav");
+const fav = require("../models/Fav");
 
 exports.getIndex = (req, res, next) => {
-  Home.fetchAll().then(data => {
+  Home.find().then(data => {
     const registeredHomes = data;
     res.render("store/index", {
       registeredHomes: registeredHomes,
@@ -13,7 +13,7 @@ exports.getIndex = (req, res, next) => {
 };
 
 exports.getHomes = (req, res, next) => {
-  Home.fetchAll().then(data => {
+  Home.find().then(data => {
     const registeredHomes = data;
     res.render("store/home-list", {
       registeredHomes: registeredHomes,
@@ -33,7 +33,7 @@ exports.getBookings = (req, res, next) => {
 exports.getHomeDetails = (req, res) => {
   const _id = req.params._id;
   // console.log("at home details page for _id: ", _id);
-  Home.fetchById(_id).then(home => {
+  Home.findById(_id).then(home => {
     res.render("store/home-detail", {
     pageTitle: "home details",
     currentPage: "homes",
@@ -43,22 +43,34 @@ exports.getHomeDetails = (req, res) => {
 }
 
 exports.getFavouriteList = (req, res, next) => {
-  favHomes.getFavs((myFav) =>
+  fav.find()
+  .populate('homeId')
+  .then((favourites => {
+    const myFav = favourites.map(fav => fav.homeId);
     res.render("store/favourite-list", {
       registeredHomes: myFav,
       pageTitle: "My Favourites",
-      currentPage: "favourites",
+      currentPage: "favourites",  
     })
-  );
+  }))
 };
 
 exports.postAddFav = (req, res, next) => {
-  res.redirect('/favourites');
-  favHomes.addFav(req.body._id);
+  const homeId = req.body._id;;
+  const Fav = new fav({homeId});
+  Fav.save().then(() => {
+    res.redirect('/favourites');
+  }).catch(err => {
+    console.log('home already added')
+    res.redirect('/favourites')
+  })
   // console.log('home added to fav', req.body._id);
 }
 
 exports.postRemFav = (req, res) => {
-  res.redirect('/favourites');
-  favHomes.remFav(req.body._id);
+  const homeId = req.body._id;
+  console.log(homeId);
+  fav.findOneAndDelete({homeId: homeId}).then(() => {
+    res.redirect('/favourites');
+  })
 }
