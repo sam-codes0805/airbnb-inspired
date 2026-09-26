@@ -4,6 +4,7 @@ exports.getAddHome = (req, res, next) => {
   res.render("host/addHome", {
     pageTitle: "Add Home to airbnb",
     currentPage: "addHome",
+    isLoggedIn: req.session.isLoggedIn
   });
 };
 
@@ -14,6 +15,7 @@ exports.getHostHomes = (req, res, next) => {
       registeredHomes: registeredHomes,
       pageTitle: "Host Homes List",
       currentPage: "host-homes",
+      isLoggedIn: req.session.isLoggedIn
     })
   })
 };
@@ -28,6 +30,7 @@ exports.postAddHome = (req, res) => {
   res.render("host/home-added", {
     pageTitle: "Home Added Successfully",
     currentPage: "homeAdded",
+    isLoggedIn: req.session.isLoggedIn
   });
 };
 
@@ -36,7 +39,8 @@ exports.postEditHome = (req, res) => {
     res.render("host/edit-home", {
     pageTitle: "edit Home",
     currentPage: 'host-homes',
-    Home: Home
+    Home: Home,
+    isLoggedIn: req.session.isLoggedIn
     }
   )})
 }
