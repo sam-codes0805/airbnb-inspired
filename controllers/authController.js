@@ -2,19 +2,39 @@ const { check, validationResult } = require("express-validator");
 const User = require("../models/user");
 const bcrypt = require("bcryptjs");
 
+// jet-explode66@bravealias.com
+
 exports.getLogin = (req, res) => {
   res.render("auth/login", {
     pageTitle: "Login Page",
     currentPage: 'login',
-    isLoggedIn: false
+    isLoggedIn: false,
+    errors: [],
   })
 }
 
-exports.postLogin = (req, res) => {
-  console.log(req.body);
-  req.session.isLoggedIn = true;
-  res.redirect('/');
-}
+exports.postLogin = async (req, res) => {
+  console.log(req.body.password, req.body.username);
+  
+  User.findOne({ email: req.body.username })
+    .then(user => {
+      bcrypt.compare(req.body.password, user.password)
+        .then(doMatch => {
+          if (doMatch) {
+            req.session.isLoggedIn = true;
+            res.redirect('/');
+            req.session.userType = user.userType;
+          }
+          else {
+            res.send('not matched');
+          }
+        })
+      }
+    )
+  } 
+      
+
+  // req.session.isLoggedIn = true;
 
 exports.postLogout = (req, res) => {
   req.session.destroy(() => {

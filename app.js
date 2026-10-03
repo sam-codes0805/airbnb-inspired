@@ -40,12 +40,10 @@ app.use(session({
 app.use(storeRouter);
 
 app.use("/host", (req, res, next) => {
-  if(!req.session.isLoggedIn){
-    console.log(req.session);
-    res.redirect('/login');
-  }else{
-    console.log(req.session);
+  if(req.session.isLoggedIn && req.session.userType === 'host') {
     next();
+  }else {
+    res.redirect('/login');
   }
 })
 app.use("/host", hostRouter);

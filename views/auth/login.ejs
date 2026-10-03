@@ -5,6 +5,7 @@
     <main class="container mx-auto mt-8 p-8 bg-white rounded-lg shadow-md">
       <h1 class="text-3xl font-bold mb-6 text-center text-gray-800">Login with your info</h1>
       <form action="/login" method="POST" class="max-w-md mx-auto">
+        <%- include('../partials/errors') %>
         <input
           type="text"
           name="username"
