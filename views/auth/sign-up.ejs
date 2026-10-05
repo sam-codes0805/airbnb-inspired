@@ -44,11 +44,11 @@
               <legend class="mb-2 block text-sm font-medium text-gray-700">I want to join as</legend>
               <div class="grid grid-cols-2 gap-3">
                 <label class="cursor-pointer">
-                  <input class="peer sr-only" type="radio" name="userType" value="guest" checked="<% oldInput.userType === "guest"%>" required />
+                  <input class="peer sr-only" type="radio" name="userType" value="guest" checked="<% oldInput.userType === 'guest' %>" required />
                   <span class="block rounded-md border border-gray-300 px-4 py-3 text-center text-sm font-medium text-gray-700 transition hover:border-red-300 peer-checked:border-red-500 peer-checked:bg-red-50 peer-checked:text-red-700 peer-focus-visible:ring-2 peer-focus-visible:ring-red-500">Guest</span>
                 </label>
                 <label class="cursor-pointer">
-                  <input class="peer sr-only" checked="<% oldInput.userType === "host" %>" type="radio" name="userType" value="host" required />
+                  <input class="peer sr-only" checked="<% oldInput.userType === 'host' %>" type="radio" name="userType" value="host" required />
                   <span class="block rounded-md border border-gray-300 px-4 py-3 text-center text-sm font-medium text-gray-700 transition hover:border-red-300 peer-checked:border-red-500 peer-checked:bg-red-50 peer-checked:text-red-700 peer-focus-visible:ring-2 peer-focus-visible:ring-red-500">Host</span>
                 </label>
               </div>

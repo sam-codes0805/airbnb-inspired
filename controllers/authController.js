@@ -13,24 +13,51 @@ exports.getLogin = (req, res) => {
   })
 }
 
-exports.postLogin = async (req, res) => {
-  console.log(req.body.password, req.body.username);
-  
-  User.findOne({ email: req.body.username })
+exports.postLogin = (req, res) => {
+
+  User.findOne({ email: req.body.email })
     .then(user => {
+      if(!user) {
+        return res.status(422).render("auth/login", {
+          pageTitle: "Login Page",
+          currentPage: 'login',
+          isLoggedIn: false,
+          errors: ["User does not exist."],
+        })
+      };
+
       bcrypt.compare(req.body.password, user.password)
         .then(doMatch => {
           if (doMatch) {
             req.session.isLoggedIn = true;
-            res.redirect('/');
+            req.session.user = {
+              _id: user._id.toString(),
+              firstname: user.firstname,
+              lastname: user.lastname,
+              email: user.email,
+              userType: user.userType,
+            };
             req.session.userType = user.userType;
+            return req.session.save(err => {
+              console.error(err);
+              res.redirect('/');
+            });
+            // res.redirect('/');      
           }
           else {
-            res.send('not matched');
+            res.render("auth/login", {
+              pageTitle: "Login Page",
+              currentPage: 'login',
+              isLoggedIn: false,
+              errors: ["Invalid Email or Password"],
+            })
           }
         })
       }
-    )
+    ).catch(err => {
+      console.error(err);
+      res.redirect('/login');
+    })
   } 
       
 
@@ -94,7 +121,7 @@ exports.postSignUp = [
   check("userType")
     .notEmpty()
     .withMessage("Please select a user type")
-    .isIn(["admin", "guest"])
+    .isIn(["host", "guest"])
     .withMessage("Invalid User Type")
   ,
   check("terms")
