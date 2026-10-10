@@ -12,5 +12,6 @@ storeRouter.get("/favourites", storeController.getFavouriteList);
 storeRouter.get("/homes/:_id", storeController.getHomeDetails);
 storeRouter.post("/add-fav", storeController.postAddFav);
 storeRouter.post("/rem-fav", storeController.postRemFav);
+storeRouter.get("/rules/:_id", storeController.getRules);
 
 module.exports = storeRouter;

@@ -39,7 +39,7 @@ exports.postLogin = (req, res) => {
             };
             req.session.userType = user.userType;
             return req.session.save(err => {
-              console.error(err);
+              if (err) console.error(err);
               res.redirect('/');
             });
             // res.redirect('/');      
@@ -55,7 +55,7 @@ exports.postLogin = (req, res) => {
         })
       }
     ).catch(err => {
-      console.error(err);
+      if (err) console.error(err)
       res.redirect('/login');
     })
   } 

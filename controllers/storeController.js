@@ -1,5 +1,7 @@
 const Home = require("../models/home");
 const User = require("../models/user");
+const path = require("path");
+const rootDir = require("../utils/pathUtil");
 
 exports.getIndex = (req, res, next) => {
   Home.find().then(data => {
@@ -82,3 +84,18 @@ exports.postRemFav = async (req, res) => {
   console.log("removed from fav list");
   res.redirect('/favourites');
 }
+
+exports.getRules = [(req, res, next) => {
+  if(!req.session.isLoggedIn) {
+    res.redirect('/login');
+  }
+  next();
+},
+(req, res) => {
+  res.download(path.join(rootDir, "public", "home_rules.pdf"), "home_rules.pdf", (err) => {
+    if(err) {
+      console.log(err);
+    }
+  }
+)
+}]

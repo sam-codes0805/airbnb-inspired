@@ -1,4 +1,7 @@
 const Home = require("../models/home");
+const fs = require("fs");
+const path = require("path");
+const rootDir = require("../utils/pathUtil");
 
 exports.getAddHome = (req, res, next) => {
   res.render("host/addHome", {
@@ -23,8 +26,10 @@ exports.getHostHomes = (req, res, next) => {
 };
 
 exports.postAddHome = (req, res) => {
-  const { housename, price, location, rating, photourl } = req.body;
-  const home = new Home({housename, price, location, rating, photourl});
+  const { housename, price, location, rating, desc } = req.body;
+  const photo = req.file ? req.file.filename : null;
+
+  const home = new Home({housename, price, location, rating, photo, desc});
   home.save().then(() => {
     console.log("home saved successfully");
   })
@@ -50,7 +55,8 @@ exports.postEditHome = (req, res) => {
 }
 
 exports.postHomeEdited = (req, res) => {
-  const { _id, housename, price, location, rating, photourl } = req.body;
+  const { _id, housename, price, location, rating, desc} = req.body;
+  const photo = req.file ? req.file.filename : null;
   console.log(housename);
   Home.findById(_id).then((home) => {
     if(!home){
@@ -61,7 +67,15 @@ exports.postHomeEdited = (req, res) => {
     home.price = price;
     home.location = location;
     home.rating = rating;
-    home.photourl = photourl;
+    if(photo) {
+      fs.unlink(path.join(rootDir, 'uploads', home.photo), (err) => {
+        if(err) {
+          console.log('error while deleting photo', err);
+        }else console.log('photo deleted successfully');
+      })
+      home.photo = photo;
+    }
+    home.desc = desc;
 
     return home.save();
   }).then(() => {

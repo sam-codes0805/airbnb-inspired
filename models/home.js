@@ -17,7 +17,11 @@ const homeSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
-    photourl: {
+    photo: {
+        type: String,
+        required: true
+    },
+    desc: {
         type: String,
         required: true
     }

@@ -1,4 +1,12 @@
-<form class="mt-3 inline-block" action="/add-fav" method="post">
-              <input type="submit" class="bg-red-400 text-white w-40 inline-block rounded-xl py-2 px-4 hover:bg-red-500" value="Add to favourite">
-              <input type="hidden" value="<%= home._id %>" name="_id" id="id">
+<% const isCompact = typeof compact !== 'undefined' && compact; %>
+
+<form action="/add-fav" method="post" class="<%= isCompact ? 'flex-1' : 'inline-block' %>">
+  <input type="hidden" value="<%= home._id %>" name="_id">
+  <button type="submit"
+          class="<%= isCompact
+            ? 'w-full bg-red-400 text-white text-sm font-medium rounded-xl py-2 px-4 hover:bg-red-500 transition'
+            : 'bg-red-400 text-white w-48 inline-block rounded-xl py-2 px-4 hover:bg-red-500 transition' %>">
+    <i class="fa-solid fa-heart mr-1"></i>
+    <%= isCompact ? 'Save' : 'Add to favourite' %>
+  </button>
 </form>

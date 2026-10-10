@@ -1,12 +1,15 @@
 // Core Module
-const mongoose = require('mongoose');
-const session = require('express-session');
 const path = require('path');
-require('dotenv').config();
-const mongoDbStore = require('connect-mongodb-session')(session);
+const session = require('express-session');
+const express = require('express');
+
 
 // External Module
-const express = require('express');
+require('dotenv').config();
+const mongoose = require('mongoose');
+const mongoDbStore = require('connect-mongodb-session')(session);
+const multer = require('multer');
+
 
 
 //Local Module
@@ -21,6 +24,30 @@ const rootDir = require("./utils/pathUtil");
 
 const app = express();
 
+const fileStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads');
+  },
+  filename: (req, file, cb) => {
+    cb(null, new Date().toISOString().replace(/:/g, '-') + '-' + file.originalname);
+  }
+});
+
+const fileFilter = (req, file, cb) => {
+  if (file.mimetype === 'image/png' || file.mimetype === 'image/jpg' || file.mimetype === 'image/jpeg') {
+    cb(null, true);
+  } else {
+    cb(null, false);
+  }
+};
+app.use(multer({ storage: fileStorage, fileFilter: fileFilter }).single('photo'));
+
+app.use(express.urlencoded());
+app.use(express.static(path.join(rootDir, 'public')))
+app.use('/uploads', express.static(path.join(rootDir, 'uploads')));
+app.use('/host/uploads', express.static(path.join(rootDir, 'uploads')));
+app.use('/homes/uploads', express.static(path.join(rootDir, 'uploads')));
+
 app.set('view engine', 'ejs');
 app.set('views', 'views');
 
@@ -29,7 +56,6 @@ const store = new mongoDbStore({
   collection: 'sessions'
 })
 
-app.use(express.urlencoded());
 
 app.use(session({
   secret: 'Airbnb Private',
@@ -49,7 +75,6 @@ app.use("/host", (req, res, next) => {
 app.use("/host", hostRouter);
 app.use(authRouter);
 
-app.use(express.static(path.join(rootDir, 'public')))
 
 app.use(errorsController.pageNotFound);
 

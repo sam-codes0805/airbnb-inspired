@@ -2,9 +2,124 @@
   </head>
   <body>
     <%- include('../partials/nav') %>
-    <main class="container mx-auto mt-20 text-center">
-      <h2 class="text-6xl font-bold text-red-500 mb-4">My Bookings</h2>
-      <p class="text-2xl text-gray-700 mb-8">Bookings will appear here</p>
+
+    <main class="container mx-auto px-4 my-10 max-w-5xl">
+
+      <!-- Heading -->
+      <div class="text-center mb-10">
+        <h2 class="text-3xl md:text-4xl text-red-500 font-bold">My bookings</h2>
+        <p class="mt-2 text-gray-500">Your upcoming and past stays</p>
+        <div class="w-20 h-1 bg-red-400 rounded-full mx-auto mt-4"></div>
+      </div>
+
+      <% const list = (typeof bookings !== 'undefined' && bookings) ? bookings : []; %>
+
+      <% if (list.length === 0) { %>
+
+        <!-- Empty state -->
+        <div class="max-w-md mx-auto text-center bg-red-50 border border-red-200 rounded-2xl p-10">
+          <i class="fa-regular fa-calendar-check text-5xl text-red-300"></i>
+          <h3 class="mt-4 text-xl font-semibold text-gray-800">No bookings yet</h3>
+          <p class="mt-2 text-gray-500">When you book a home, your trip details will appear here.</p>
+          <div class="mt-6 flex flex-wrap justify-center gap-3">
+            <a href="/homes"
+               class="bg-red-400 text-white font-medium rounded-xl py-2 px-6 hover:bg-red-500 transition">
+              Browse homes
+            </a>
+            <a href="/favourites"
+               class="border border-red-400 text-red-400 font-medium rounded-xl py-2 px-6
+                      hover:bg-red-400 hover:text-white transition">
+              View favourites
+            </a>
+          </div>
+        </div>
+
+      <% } else { %>
+
+        <!-- Booking list -->
+        <div class="space-y-6">
+          <% list.forEach(b => {
+               const home = b.home || {};
+               const nights = Math.max(1, Math.round((new Date(b.checkOut) - new Date(b.checkIn)) / 86400000));
+               const fmt = d => new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+               const status = b.status || 'Confirmed';
+               const statusStyle = status === 'Cancelled'
+                 ? 'bg-gray-100 text-gray-500'
+                 : status === 'Pending'
+                   ? 'bg-yellow-100 text-yellow-700'
+                   : 'bg-green-100 text-green-700';
+          %>
+            <div class="bg-white rounded-2xl shadow-md border border-red-100 overflow-hidden
+                        hover:shadow-xl transition duration-300 flex flex-col md:flex-row">
+
+              <!-- Image -->
+              <img src="/uploads/<%= home.photo %>" alt="<%= home.housename %>"
+                   class="w-full md:w-64 h-48 md:h-auto object-cover">
+
+              <!-- Details -->
+              <div class="p-5 flex-1 flex flex-col">
+                <div class="flex items-start justify-between gap-3">
+                  <div class="min-w-0">
+                    <h3 class="text-xl font-semibold text-gray-800 truncate"><%= home.housename %></h3>
+                    <p class="text-gray-500 text-sm mt-1">
+                      <i class="fas fa-map-marker-alt text-red-400 mr-2"></i><%= home.location %>
+                    </p>
+                  </div>
+                  <span class="text-xs font-semibold rounded-full px-3 py-1 <%= statusStyle %>"><%= status %></span>
+                </div>
+
+                <!-- Trip info -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-5">
+                  <div class="bg-red-50 border border-red-100 rounded-xl p-3 text-center">
+                    <p class="text-xs uppercase tracking-wide text-red-400 font-semibold">Check-in</p>
+                    <p class="mt-1 text-sm font-semibold text-gray-800"><%= fmt(b.checkIn) %></p>
+                  </div>
+                  <div class="bg-red-50 border border-red-100 rounded-xl p-3 text-center">
+                    <p class="text-xs uppercase tracking-wide text-red-400 font-semibold">Check-out</p>
+                    <p class="mt-1 text-sm font-semibold text-gray-800"><%= fmt(b.checkOut) %></p>
+                  </div>
+                  <div class="bg-red-50 border border-red-100 rounded-xl p-3 text-center">
+                    <p class="text-xs uppercase tracking-wide text-red-400 font-semibold">Nights</p>
+                    <p class="mt-1 text-sm font-semibold text-gray-800"><%= nights %></p>
+                  </div>
+                  <div class="bg-red-50 border border-red-100 rounded-xl p-3 text-center">
+                    <p class="text-xs uppercase tracking-wide text-red-400 font-semibold">Guests</p>
+                    <p class="mt-1 text-sm font-semibold text-gray-800"><%= b.guests || 1 %></p>
+                  </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="mt-auto pt-5 flex flex-wrap items-center justify-between gap-3 border-t border-red-100 mt-5">
+                  <div>
+                    <span class="text-sm text-gray-500">Total</span>
+                    <span class="text-xl font-bold text-red-500 ml-1">Rs <%= nights * home.price %></span>
+                  </div>
+                  <div class="flex gap-3">
+                    <a href="/homes/<%= home._id %>"
+                       class="bg-red-400 text-white text-sm font-medium rounded-xl py-2 px-4 hover:bg-red-500 transition">
+                      View home
+                    </a>
+                    <% if (status !== 'Cancelled') { %>
+                      <form action="/cancel-booking" method="post"
+                            onsubmit="return confirm('Cancel this booking?')">
+                        <input type="hidden" name="_id" value="<%= b._id %>">
+                        <button type="submit"
+                                class="border border-red-400 text-red-400 text-sm font-medium rounded-xl py-2 px-4
+                                       hover:bg-red-400 hover:text-white transition">
+                          Cancel
+                        </button>
+                      </form>
+                    <% } %>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          <% }) %>
+        </div>
+
+      <% } %>
+
     </main>
   </body>
 </html>
